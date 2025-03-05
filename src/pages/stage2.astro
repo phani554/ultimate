@@ -1,0 +1,437 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CyberLayout from '../layouts/CyberLayout.astro';
+import TypedText from '../components/TypedText.astro';
+import PuzzleForm from '../components/PuzzleForm.astro';
+import MaskedImage from '../components/MaskedImage.astro';
+import AsciiArt from '../components/AsciiArt.astro';
+import AsciiHeader from '../components/AsciiHeader.astro';
+---
+
+<Layout title="Stage 2 - Cyber Scavenger Hunt">
+	<CyberLayout>
+		<AsciiHeader title="MISSION: STAGE 2" />
+		
+		<div class="terminal-container">
+			<div class="terminal-header">
+				<div class="terminal-title">MISSION: STAGE 2</div>
+				<div class="terminal-controls">
+					<span class="control minimize"></span>
+					<span class="control maximize"></span>
+					<span class="control close"></span>
+				</div>
+			</div>
+			
+			<div class="terminal-body">
+				<div class="terminal-line">
+					<span class="prompt">$</span>
+					<TypedText text="./continue_mission.sh" delay={500} speed={70} />
+				</div>
+				
+				<div class="terminal-output" id="stage2-content">
+					<TypedText text="MISSION UPDATE: THE PHANTOM'S SECRET MESSAGE" delay={2000} speed={30} className="stage-title" />
+					
+					<div class="stage-content" style="opacity: 0;">
+						<div class="story-section">
+							<p>🔓 <strong>EXCELLENT WORK, RECRUIT!</strong> 🔓</p>
+							<p>"Great job identifying ransomware," says Commander Hayes. "We've intercepted a secret message from The Phantoms, but it's encrypted. We need your help to decode it."</p>
+							<p>The commander shows you a strange-looking image on the screen. "This image contains three layers of encryption. Solve each puzzle to reveal a piece of the image."</p>
+						</div>
+						
+						<div class="mission-objective">
+							<h3>🎯 MISSION OBJECTIVE:</h3>
+							<p>Decode The Phantom's secret message by solving the puzzles below. Each correct answer will reveal part of the hidden image.</p>
+						</div>
+						
+						<MaskedImage placeholder="[ENCRYPTED IMAGE]" revealStages={3} imagePath="/cyber-lock.jpg" />
+						
+						<!-- Puzzle Container - Only one puzzle visible at a time -->
+						<div class="puzzle-container">
+							<!-- Puzzle 1 -->
+							<div id="puzzle-1" class="puzzle-slide active">
+								<div class="puzzle-number">PUZZLE 1/3</div>
+								<AsciiArt placeholder="Decrypting Layer 1..." />
+								<PuzzleForm 
+									id="cipher-puzzle"
+									question="The Phantoms have encoded a message using a simple letter-shifting technique. If A becomes C, B becomes D, and C becomes E, what does this message say? 'KUC KU NKV'"
+									hint="This is a Caesar cipher with a shift of 2 letters forward. Try writing out the alphabet and shifting each letter in the message backward by 2 positions."
+									answer="isa is lit"
+									onSuccess="nextPuzzle"
+								/>
+							</div>
+							
+							<!-- Puzzle 2 -->
+							<div id="puzzle-2" class="puzzle-slide">
+								<div class="puzzle-number">PUZZLE 2/3</div>
+								<AsciiArt placeholder="Decrypting Layer 2..." />
+								<PuzzleForm 
+									id="hash-puzzle"
+									question="The Phantoms use a common password hashing technique. What's the name of the algorithm that creates a 128-bit 'digital fingerprint' and is often shown as 32 hexadecimal characters?"
+									hint="This algorithm's name starts with 'M' and ends with '5'. It's considered outdated for password storage but is still commonly referenced in cybersecurity basics."
+									answer="md5"
+									onSuccess="nextPuzzle"
+								/>
+							</div>
+							
+							<!-- Puzzle 3 -->
+							<div id="puzzle-3" class="puzzle-slide">
+								<div class="puzzle-number">PUZZLE 3/3</div>
+								<AsciiArt placeholder="Decrypting Final Layer..." />
+								<PuzzleForm 
+									id="key-puzzle"
+									question="The Phantoms use a system where messages are locked with one key and unlocked with a different key. In this system, which key can be safely shared with everyone?"
+									hint="This is about public key cryptography. One key is kept secret, while the other can be freely distributed to anyone who wants to send you an encrypted message."
+									answer="public key"
+									onSuccess="showFinalPuzzle"
+								/>
+							</div>
+						</div>
+						
+						<div id="final-puzzle" class="hidden">
+							<div class="success-message">
+								<p>🔓 <strong>IMAGE DECRYPTED!</strong> 🔓</p>
+								<p>"Impressive work!" Commander Hayes exclaims. "The image reveals that The Phantoms are planning to use a technique where they pretend to be a legitimate website to steal login credentials."</p>
+								<p>The commander points to the number visible in the image. "Take note of that key number. You'll need it in the final stage."</p>
+							</div>
+							
+							<PuzzleForm 
+								id="final-stage2-puzzle"
+								question="FINAL CHALLENGE: What is the name of this attack where hackers create fake websites that look identical to real ones in order to steal user information?"
+								hint="This type of attack is named after a fishing activity, but with a different spelling. Hackers are 'fishing' for your personal information."
+								answer="phishing"
+								onSuccess="unlockStage3"
+							/>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</CyberLayout>
+</Layout>
+
+<style>
+	.terminal-container {
+		width: 100%;
+		max-width: 800px;
+		margin: 0 auto;
+		background-color: var(--terminal-bg);
+		border-radius: 8px;
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+		overflow: hidden;
+		animation: glitchIn 1s ease-out;
+	}
+	
+	.terminal-header {
+		background-color: var(--terminal-header);
+		padding: 10px 15px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		border-bottom: 1px solid var(--terminal-dim);
+	}
+	
+	.terminal-title {
+		color: var(--terminal-dim);
+		font-size: 0.9em;
+		font-weight: bold;
+	}
+	
+	.terminal-controls {
+		display: flex;
+		gap: 8px;
+	}
+	
+	.control {
+		width: 12px;
+		height: 12px;
+		border-radius: 50%;
+		display: inline-block;
+	}
+	
+	.minimize {
+		background-color: #f1fa8c;
+	}
+	
+	.maximize {
+		background-color: #50fa7b;
+	}
+	
+	.close {
+		background-color: #ff5555;
+	}
+	
+	.terminal-body {
+		padding: 20px;
+		color: var(--terminal-text);
+		font-family: 'Courier New', monospace;
+		min-height: 400px;
+	}
+	
+	.terminal-line {
+		display: flex;
+		align-items: center;
+		margin-bottom: 15px;
+	}
+	
+	.prompt {
+		color: var(--terminal-success);
+		margin-right: 10px;
+	}
+	
+	.terminal-output {
+		margin-top: 20px;
+	}
+	
+	.stage-title {
+		color: var(--terminal-accent);
+		font-size: 1.2em;
+		font-weight: bold;
+		margin-bottom: 20px;
+		display: block;
+	}
+	
+	.stage-content {
+		transition: opacity 1s ease-in-out;
+	}
+	
+	.story-section {
+		margin-bottom: 20px;
+		padding: 15px;
+		border-left: 3px solid var(--terminal-accent);
+		background-color: rgba(139, 233, 253, 0.05);
+	}
+	
+	.mission-objective {
+		margin-bottom: 20px;
+		padding: 15px;
+		border: 1px dashed var(--terminal-dim);
+		border-radius: 4px;
+	}
+	
+	.mission-objective h3 {
+		color: var(--terminal-warning);
+		margin-top: 0;
+	}
+	
+	/* Puzzle Slides */
+	.puzzle-container {
+		position: relative;
+		margin: 20px 0;
+		min-height: 300px;
+	}
+	
+	.puzzle-slide {
+		display: none;
+		opacity: 0;
+		transition: opacity 0.5s ease-in-out;
+	}
+	
+	.puzzle-slide.active {
+		display: block;
+		opacity: 1;
+		animation: glitchIn 0.8s ease-out;
+	}
+	
+	.puzzle-number {
+		color: var(--terminal-dim);
+		font-size: 0.8em;
+		margin-bottom: 10px;
+		text-align: right;
+	}
+	
+	.success-message {
+		color: var(--terminal-success);
+		margin: 20px 0;
+		padding: 15px;
+		border: 1px solid var(--terminal-success);
+		border-radius: 4px;
+		background-color: rgba(0, 255, 0, 0.1);
+		animation: glitchIn 0.8s ease-out;
+	}
+	
+	.hidden {
+		display: none;
+	}
+	
+	/* Glitch Animation */
+	@keyframes glitchIn {
+		0% {
+			opacity: 0;
+			clip-path: inset(0 0 100% 0);
+			transform: translateY(50px);
+		}
+		20% {
+			clip-path: inset(33% 0 66% 0);
+		}
+		40% {
+			clip-path: inset(66% 0 33% 0);
+		}
+		60% {
+			clip-path: inset(33% 0 66% 0);
+		}
+		80% {
+			clip-path: inset(10% 0 90% 0);
+		}
+		100% {
+			opacity: 1;
+			clip-path: inset(0 0 0 0);
+			transform: translateY(0);
+		}
+	}
+</style>
+
+<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		// Check if user should have access to this stage
+		const stage1Completed = localStorage.getItem('puzzle_start-puzzle') === 'solved';
+		if (!stage1Completed) {
+			window.location.href = '/';
+			return;
+		}
+		
+		// Show stage content after title is typed
+		const stageTitle = document.querySelector('.stage-title');
+		if (stageTitle) {
+			stageTitle.addEventListener('typingComplete', () => {
+				setTimeout(() => {
+					const stageContent = document.querySelector('.stage-content');
+					if (stageContent) {
+						stageContent.style.opacity = '1';
+					}
+				}, 500);
+			});
+		}
+		
+		// Reset image reveal state when starting stage 2
+		// Only do this if the user hasn't completed all puzzles
+		const puzzle1Solved = localStorage.getItem('puzzle_cipher-puzzle') === 'solved';
+		const puzzle2Solved = localStorage.getItem('puzzle_hash-puzzle') === 'solved';
+		const puzzle3Solved = localStorage.getItem('puzzle_key-puzzle') === 'solved';
+		const allPuzzlesSolved = puzzle1Solved && puzzle2Solved && puzzle3Solved;
+		
+		if (!allPuzzlesSolved) {
+			localStorage.removeItem('cyber_lock_revealed');
+		}
+		
+		// Function to show next puzzle
+		window.nextPuzzle = (puzzleId) => {
+			// Add glitch effect to body
+			document.body.classList.add('glitch-transition');
+			
+			setTimeout(() => {
+				let currentPuzzle;
+				let nextPuzzle;
+				
+				if (puzzleId === 'cipher-puzzle') {
+					currentPuzzle = document.getElementById('puzzle-1');
+					nextPuzzle = document.getElementById('puzzle-2');
+				} else if (puzzleId === 'hash-puzzle') {
+					currentPuzzle = document.getElementById('puzzle-2');
+					nextPuzzle = document.getElementById('puzzle-3');
+				}
+				
+				if (currentPuzzle && nextPuzzle) {
+					currentPuzzle.classList.remove('active');
+					nextPuzzle.classList.add('active');
+				}
+				
+				// Trigger image reveal
+				const revealEvent = new CustomEvent('revealImage', { detail: { puzzleId } });
+				document.dispatchEvent(revealEvent);
+				
+				// Remove glitch effect
+				document.body.classList.remove('glitch-transition');
+			}, 1000);
+		};
+		
+		// Function to show final puzzle
+		window.showFinalPuzzle = (puzzleId) => {
+			// Add glitch effect to body
+			document.body.classList.add('glitch-transition');
+			
+			setTimeout(() => {
+				const currentPuzzle = document.getElementById('puzzle-3');
+				const finalPuzzle = document.getElementById('final-puzzle');
+				
+				if (currentPuzzle && finalPuzzle) {
+					currentPuzzle.classList.remove('active');
+					finalPuzzle.classList.remove('hidden');
+					finalPuzzle.scrollIntoView({ behavior: 'smooth' });
+				}
+				
+				// Trigger image reveal
+				const revealEvent = new CustomEvent('revealImage', { detail: { puzzleId } });
+				document.dispatchEvent(revealEvent);
+				
+				// Remove glitch effect
+				document.body.classList.remove('glitch-transition');
+			}, 1000);
+		};
+		
+		// Function to unlock stage 3
+		window.unlockStage3 = () => {
+			// Add glitch transition effect
+			document.body.classList.add('glitch-transition');
+			
+			setTimeout(() => {
+				// Store completion in localStorage
+				localStorage.setItem('puzzle_final-stage2-puzzle', 'solved');
+				
+				// Redirect to stage 3
+				window.location.href = '/stage3';
+			}, 1000);
+		};
+		
+		// Check if we need to restore puzzle progress
+		if (puzzle1Solved) {
+			// If puzzle 1 is solved, show puzzle 2
+			if (puzzle2Solved) {
+				// If puzzle 2 is also solved, show puzzle 3
+				if (puzzle3Solved) {
+					// If all puzzles are solved, show final puzzle
+					const puzzle3 = document.getElementById('puzzle-3');
+					const finalPuzzle = document.getElementById('final-puzzle');
+					
+					if (puzzle3 && finalPuzzle) {
+						document.getElementById('puzzle-1').classList.remove('active');
+						finalPuzzle.classList.remove('hidden');
+						
+						// Trigger all image reveals
+						for (let i = 1; i <= 3; i++) {
+							const revealEvent = new CustomEvent('revealImage');
+							document.dispatchEvent(revealEvent);
+						}
+					}
+				} else {
+					// Show puzzle 3
+					const puzzle1 = document.getElementById('puzzle-1');
+					const puzzle3 = document.getElementById('puzzle-3');
+					
+					if (puzzle1 && puzzle3) {
+						puzzle1.classList.remove('active');
+						puzzle3.classList.add('active');
+						
+						// Trigger image reveals for puzzles 1 and 2
+						for (let i = 1; i <= 2; i++) {
+							const revealEvent = new CustomEvent('revealImage');
+							document.dispatchEvent(revealEvent);
+						}
+					}
+				}
+			} else {
+				// Show puzzle 2
+				const puzzle1 = document.getElementById('puzzle-1');
+				const puzzle2 = document.getElementById('puzzle-2');
+				
+				if (puzzle1 && puzzle2) {
+					puzzle1.classList.remove('active');
+					puzzle2.classList.add('active');
+					
+					// Trigger image reveal for puzzle 1
+					const revealEvent = new CustomEvent('revealImage');
+					document.dispatchEvent(revealEvent);
+				}
+			}
+		}
+	});
+</script>

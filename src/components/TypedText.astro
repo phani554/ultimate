@@ -1,0 +1,67 @@
+---
+interface Props {
+	text: string;
+	delay?: number;
+	speed?: number;
+	className?: string;
+}
+
+const { text, delay = 0, speed = 50, className = '' } = Astro.props;
+---
+
+<span class={`typed-text ${className}`} data-text={text} data-delay={delay} data-speed={speed}></span>
+
+<style>
+	.typed-text {
+		display: inline-block;
+		white-space: pre-wrap;
+	}
+	
+	.typed-text::after {
+		content: '|';
+		animation: blink 1s infinite;
+	}
+	
+	@keyframes blink {
+		0%, 100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0;
+		}
+	}
+</style>
+
+<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		const typedElements = document.querySelectorAll('.typed-text');
+		
+		typedElements.forEach(element => {
+			const text = element.getAttribute('data-text') || '';
+			const delay = parseInt(element.getAttribute('data-delay') || '0');
+			const speed = parseInt(element.getAttribute('data-speed') || '50');
+			
+			setTimeout(() => {
+				let i = 0;
+				element.textContent = '';
+				
+				const typeInterval = setInterval(() => {
+					if (i < text.length) {
+						element.textContent += text.charAt(i);
+						i++;
+					} else {
+						clearInterval(typeInterval);
+						
+						// Remove blinking cursor
+						element.style.animation = 'none';
+						element.classList.add('typing-complete');
+						
+						// Dispatch event when typing is complete
+						const event = new CustomEvent('typingComplete');
+						element.dispatchEvent(event);
+					}
+				}, speed);
+			}, delay);
+		});
+	});
+</script>

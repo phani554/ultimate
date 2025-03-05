@@ -1,0 +1,249 @@
+---
+---
+
+<div id="loading-screen" class="loading-screen">
+  <div class="loading-content">
+    <pre class="loading-ascii">
+ ██╗      ██████╗  █████╗ ██████╗ ██╗███╗   ██╗ ██████╗ 
+ ██║     ██╔═══██╗██╔══██╗██╔══██╗██║████╗  ██║██╔════╝ 
+ ██║     ██║   ██║███████║██║  ██║██║██╔██╗ ██║██║  ███╗
+ ██║     ██║   ██║██╔══██║██║  ██║██║██║╚██╗██║██║   ██║
+ ███████╗╚██████╔╝██║  ██║██████╔╝██║██║ ╚████║╚██████╔╝
+ ╚══════╝ ╚═════╝ ╚═╝  ╚═╝╚═════╝ ╚═╝╚═╝  ╚═══╝ ╚═════╝ 
+    </pre>
+    
+    <div class="loading-progress">
+      <div class="progress-bar">
+        <div id="progress-fill" class="progress-fill"></div>
+      </div>
+      <div id="loading-text" class="loading-text">Initializing system...</div>
+    </div>
+    
+    <div class="loading-logs">
+      <div class="log-container" id="log-container"></div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Courier New', monospace;
+  }
+  
+  .loading-content {
+    width: 90%;
+    max-width: 800px;
+    background-color: var(--terminal-bg, #282a36);
+    border: 1px solid var(--terminal-dim, #6272a4);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 0 30px rgba(139, 233, 253, 0.3);
+  }
+  
+  .loading-ascii {
+    color: var(--terminal-accent, #8be9fd);
+    font-size: 0.6rem;
+    line-height: 1;
+    text-align: center;
+    margin: 0 0 20px 0;
+    animation: glitchText 2s infinite alternate;
+    white-space: pre;
+    overflow-x: auto;
+  }
+  
+  .loading-progress {
+    margin: 20px 0;
+  }
+  
+  .progress-bar {
+    height: 20px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--terminal-dim, #6272a4);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, 
+      var(--terminal-success, #50fa7b) 0%, 
+      var(--terminal-accent, #8be9fd) 50%, 
+      var(--terminal-warning, #ffb86c) 100%);
+    transition: width 0.5s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(255, 255, 255, 0.2) 50%, 
+      transparent 100%);
+    animation: progressGlow 1.5s linear infinite;
+  }
+  
+  .loading-text {
+    text-align: center;
+    color: var(--terminal-text, #f8f8f2);
+    margin-top: 10px;
+    font-size: 0.9em;
+  }
+  
+  .loading-logs {
+    height: 150px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--terminal-dim, #6272a4);
+    border-radius: 4px;
+    padding: 10px;
+    overflow-y: auto;
+    margin-top: 20px;
+  }
+  
+  .log-container {
+    font-size: 0.8em;
+    color: var(--terminal-dim, #6272a4);
+  }
+  
+  .log-entry {
+    margin-bottom: 5px;
+    line-height: 1.4;
+  }
+  
+  .log-success {
+    color: var(--terminal-success, #50fa7b);
+  }
+  
+  .log-warning {
+    color: var(--terminal-warning, #ffb86c);
+  }
+  
+  .log-error {
+    color: var(--terminal-error, #ff5555);
+  }
+  
+  @keyframes progressGlow {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+  
+  @keyframes glitchText {
+    0% {
+      text-shadow: 0.05em 0 0 rgba(255, 0, 0, 0.75), -0.05em -0.025em 0 rgba(0, 255, 0, 0.75), -0.025em 0.05em 0 rgba(0, 0, 255, 0.75);
+    }
+    14% {
+      text-shadow: 0.05em 0 0 rgba(255, 0, 0, 0.75), -0.05em -0.025em 0 rgba(0, 255, 0, 0.75), -0.025em 0.05em 0 rgba(0, 0, 255, 0.75);
+    }
+    15% {
+      text-shadow: -0.05em -0.025em 0 rgba(255, 0, 0, 0.75), 0.025em 0.025em 0 rgba(0, 255, 0, 0.75), -0.05em -0.05em 0 rgba(0, 0, 255, 0.75);
+    }
+    49% {
+      text-shadow: -0.05em -0.025em 0 rgba(255, 0, 0, 0.75), 0.025em 0.025em 0 rgba(0, 255, 0, 0.75), -0.05em -0.05em 0 rgba(0, 0, 255, 0.75);
+    }
+    50% {
+      text-shadow: 0.025em 0.05em 0 rgba(255, 0, 0, 0.75), 0.05em 0 0 rgba(0, 255, 0, 0.75), 0 -0.05em 0 rgba(0, 0, 255, 0.75);
+    }
+    99% {
+      text-shadow: 0.025em 0.05em 0 rgba(255, 0, 0, 0.75), 0.05em 0 0 rgba(0, 255, 0, 0.75), 0 -0.05em 0 rgba(0, 0, 255, 0.75);
+    }
+    100% {
+      text-shadow: -0.025em 0 0 rgba(255, 0, 0, 0.75), -0.025em -0.025em 0 rgba(0, 255, 0, 0.75), -0.025em -0.05em 0 rgba(0, 0, 255, 0.75);
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .loading-ascii {
+      font-size: 0.8rem;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const loadingScreen = document.getElementById('loading-screen');
+    const progressFill = document.getElementById('progress-fill');
+    const loadingText = document.getElementById('loading-text');
+    const logContainer = document.getElementById('log-container');
+    
+    // Log messages to display
+    const logs = [
+      { text: '> Initializing system...', type: 'normal', delay: 300 },
+      { text: '> Establishing secure connection...', type: 'normal', delay: 800 },
+      { text: '> Connection established.', type: 'success', delay: 1200 },
+      { text: '> Loading security protocols...', type: 'normal', delay: 1800 },
+      { text: '> WARNING: Unauthorized access attempts detected.', type: 'warning', delay: 2500 },
+      { text: '> Activating countermeasures...', type: 'normal', delay: 3000 },
+      { text: '> Countermeasures active.', type: 'success', delay: 3500 },
+      { text: '> Loading mission data...', type: 'normal', delay: 4000 },
+      { text: '> Decrypting mission parameters...', type: 'normal', delay: 4500 },
+      { text: '> Mission parameters loaded.', type: 'success', delay: 5000 },
+      { text: '> System ready.', type: 'success', delay: 5500 }
+    ];
+    
+    // Function to add log entry
+    const addLogEntry = (text, type = 'normal') => {
+      const logEntry = document.createElement('div');
+      logEntry.className = `log-entry ${type === 'success' ? 'log-success' : type === 'warning' ? 'log-warning' : type === 'error' ? 'log-error' : ''}`;
+      logEntry.textContent = text;
+      logContainer.appendChild(logEntry);
+      logContainer.scrollTop = logContainer.scrollHeight;
+    };
+    
+    // Function to update progress
+    const updateProgress = (percent, text) => {
+      if (progressFill) progressFill.style.width = `${percent}%`;
+      if (loadingText) loadingText.textContent = text || `Loading... ${percent}%`;
+    };
+    
+    // Display logs with delays
+    let totalDelay = 0;
+    logs.forEach((log, index) => {
+      totalDelay += log.delay;
+      setTimeout(() => {
+        addLogEntry(log.text, log.type);
+        
+        // Update progress based on log position
+        const progress = Math.round(((index + 1) / logs.length) * 100);
+        updateProgress(progress, log.text);
+        
+        // If this is the last log, hide the loading screen after a delay
+        if (index === logs.length - 1) {
+          setTimeout(() => {
+            if (loadingScreen) {
+              loadingScreen.style.opacity = '0';
+              loadingScreen.style.transition = 'opacity 1s ease-out';
+              setTimeout(() => {
+                loadingScreen.style.display = 'none';
+                
+                // Dispatch event that loading screen is complete
+                const event = new CustomEvent('loadingScreenComplete');
+                document.dispatchEvent(event);
+              }, 1000);
+            }
+          }, 1000);
+        }
+      }, totalDelay);
+    });
+  });
+</script>

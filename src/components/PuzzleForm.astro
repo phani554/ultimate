@@ -1,0 +1,316 @@
+---
+interface Props {
+	id: string;
+	question: string;
+	hint: string;
+	answer: string;
+	onSuccess: string;
+}
+
+const { id, question, hint, answer, onSuccess } = Astro.props;
+---
+
+<div class="puzzle-form" id={id + "-container"}>
+	<div class="puzzle-question">
+		<p>{question}</p>
+	</div>
+	
+	<div class="puzzle-input-container">
+		<input type="text" id={id + "-input"} class="puzzle-input" placeholder="Enter your answer..." autocomplete="off">
+		<button id={id + "-submit"} class="puzzle-submit">SUBMIT</button>
+	</div>
+	
+	<div class="puzzle-hint-container">
+		<button id={id + "-hint-toggle"} class="hint-toggle">SHOW HINT</button>
+		<div id={id + "-hint"} class="puzzle-hint hidden">
+			<p>{hint}</p>
+		</div>
+	</div>
+	
+	<div id={id + "-feedback"} class="puzzle-feedback"></div>
+</div>
+
+<style>
+	.puzzle-form {
+		margin: 30px 0;
+		padding: 20px;
+		background-color: rgba(0, 0, 0, 0.2);
+		border: 1px solid var(--terminal-dim);
+		border-radius: 4px;
+		transition: all 0.3s ease;
+	}
+	
+	.puzzle-form:hover {
+		box-shadow: 0 0 15px rgba(139, 233, 253, 0.2);
+		border-color: var(--terminal-accent);
+	}
+	
+	.puzzle-question {
+		margin-bottom: 20px;
+		color: var(--terminal-text);
+	}
+	
+	.puzzle-question p {
+		margin: 0;
+		line-height: 1.5;
+	}
+	
+	.puzzle-input-container {
+		display: flex;
+		gap: 10px;
+		margin-bottom: 15px;
+	}
+	
+	.puzzle-input {
+		flex: 1;
+		padding: 10px 15px;
+		background-color: rgba(0, 0, 0, 0.3);
+		border: 1px solid var(--terminal-dim);
+		border-radius: 4px;
+		color: var(--terminal-text);
+		font-family: 'Courier New', monospace;
+		transition: all 0.3s ease;
+	}
+	
+	.puzzle-input:focus {
+		outline: none;
+		border-color: var(--terminal-accent);
+		box-shadow: 0 0 10px rgba(139, 233, 253, 0.3);
+	}
+	
+	.puzzle-submit {
+		padding: 10px 20px;
+		background-color: rgba(139, 233, 253, 0.1);
+		border: 1px solid var(--terminal-accent);
+		border-radius: 4px;
+		color: var(--terminal-accent);
+		font-family: 'Courier New', monospace;
+		cursor: pointer;
+		transition: all 0.3s ease;
+	}
+	
+	.puzzle-submit:hover {
+		background-color: rgba(139, 233, 253, 0.2);
+		transform: translateY(-2px);
+		box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+	}
+	
+	.puzzle-submit:active {
+		transform: translateY(0);
+		box-shadow: none;
+	}
+	
+	.puzzle-hint-container {
+		margin-bottom: 15px;
+	}
+	
+	.hint-toggle {
+		background: none;
+		border: none;
+		color: var(--terminal-dim);
+		font-size: 0.8em;
+		cursor: pointer;
+		padding: 0;
+		text-decoration: underline;
+		font-family: 'Courier New', monospace;
+		transition: color 0.3s ease;
+	}
+	
+	.hint-toggle:hover {
+		color: var(--terminal-accent);
+	}
+	
+	.puzzle-hint {
+		margin-top: 10px;
+		padding: 10px;
+		background-color: rgba(255, 184, 108, 0.1);
+		border-left: 3px solid var(--terminal-warning);
+		color: var(--terminal-warning);
+		font-size: 0.9em;
+		transition: all 0.3s ease;
+	}
+	
+	.puzzle-hint p {
+		margin: 0;
+	}
+	
+	.puzzle-feedback {
+		min-height: 24px;
+		transition: all 0.3s ease;
+	}
+	
+	.feedback-error {
+		color: var(--terminal-error);
+		animation: shake 0.5s ease-in-out;
+	}
+	
+	.feedback-success {
+		color: var(--terminal-success);
+		animation: pulse 1s ease-in-out;
+	}
+	
+	.hidden {
+		display: none;
+	}
+	
+	@keyframes shake {
+		0%, 100% {
+			transform: translateX(0);
+		}
+		20%, 60% {
+			transform: translateX(-5px);
+		}
+		40%, 80% {
+			transform: translateX(5px);
+		}
+	}
+	
+	@keyframes pulse {
+		0%, 100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.5;
+		}
+	}
+</style>
+
+<script define:vars={{ id, answer, onSuccess }}>
+	document.addEventListener('DOMContentLoaded', () => {
+		const inputElement = document.getElementById(id + '-input');
+		const submitButton = document.getElementById(id + '-submit');
+		const hintToggle = document.getElementById(id + '-hint-toggle');
+		const hintElement = document.getElementById(id + '-hint');
+		const feedbackElement = document.getElementById(id + '-feedback');
+		const formContainer = document.getElementById(id + '-container');
+		
+		// Restore hint visibility state
+		if (hintElement && hintToggle) {
+			const hintVisible = localStorage.getItem('hint_' + id) === 'visible';
+			if (hintVisible) {
+				hintElement.classList.remove('hidden');
+				hintToggle.textContent = 'HIDE HINT';
+				hintElement.style.maxHeight = '100px';
+				hintElement.style.opacity = '1';
+			}
+		}
+		
+		// Toggle hint visibility
+		if (hintToggle && hintElement) {
+			hintToggle.addEventListener('click', () => {
+				const isHidden = hintElement.classList.contains('hidden');
+				
+				if (isHidden) {
+					hintElement.classList.remove('hidden');
+					hintToggle.textContent = 'HIDE HINT';
+					
+					// Add slide down animation
+					hintElement.style.maxHeight = '0';
+					hintElement.style.opacity = '0';
+					
+					// Force reflow
+					void hintElement.offsetWidth;
+					
+					// Add animation
+					hintElement.style.maxHeight = '100px';
+					hintElement.style.opacity = '1';
+					
+					// Save hint state
+					localStorage.setItem('hint_' + id, 'visible');
+				} else {
+					// Add slide up animation
+					hintElement.style.maxHeight = '0';
+					hintElement.style.opacity = '0';
+					
+					// Hide after animation
+					setTimeout(() => {
+						hintElement.classList.add('hidden');
+						hintToggle.textContent = 'SHOW HINT';
+						
+						// Save hint state
+						localStorage.setItem('hint_' + id, 'hidden');
+					}, 300);
+				}
+			});
+		}
+		
+		// Handle form submission
+		const handleSubmit = () => {
+			if (inputElement && feedbackElement) {
+				const userAnswer = inputElement.value.trim().toLowerCase();
+				const correctAnswer = answer.toLowerCase();
+				
+				// Add typing effect to feedback
+				const typeEffect = (text, className) => {
+					feedbackElement.textContent = '';
+					feedbackElement.className = 'puzzle-feedback ' + className;
+					
+					let i = 0;
+					const typeInterval = setInterval(() => {
+						if (i < text.length) {
+							feedbackElement.textContent += text.charAt(i);
+							i++;
+						} else {
+							clearInterval(typeInterval);
+						}
+					}, 30);
+				};
+				
+				if (userAnswer === correctAnswer) {
+					// Success feedback
+					typeEffect('ACCESS GRANTED: Correct answer!', 'feedback-success');
+					
+					// Mark puzzle as solved
+					localStorage.setItem('puzzle_' + id, 'solved');
+					
+					// Call success function if defined
+					if (onSuccess && typeof window[onSuccess] === 'function') {
+						setTimeout(() => {
+							window[onSuccess](id);
+						}, 1500);
+					}
+				} else {
+					// Error feedback
+					typeEffect('ACCESS DENIED: Incorrect answer. Try again.', 'feedback-error');
+					
+					// Shake input
+					if (inputElement) {
+						inputElement.classList.add('shake');
+						setTimeout(() => {
+							inputElement.classList.remove('shake');
+						}, 500);
+					}
+				}
+			}
+		};
+		
+		// Submit button click
+		if (submitButton) {
+			submitButton.addEventListener('click', handleSubmit);
+		}
+		
+		// Enter key press
+		if (inputElement) {
+			inputElement.addEventListener('keypress', (event) => {
+				if (event.key === 'Enter') {
+					handleSubmit();
+				}
+			});
+			
+			// Focus effect
+			inputElement.addEventListener('focus', () => {
+				if (formContainer) {
+					formContainer.style.borderColor = 'var(--terminal-accent)';
+					formContainer.style.boxShadow = '0 0 15px rgba(139, 233, 253, 0.2)';
+				}
+			});
+			
+			inputElement.addEventListener('blur', () => {
+				if (formContainer) {
+					formContainer.style.borderColor = 'var(--terminal-dim)';
+					formContainer.style.boxShadow = 'none';
+				}
+			});
+		}
+	});
+</script>

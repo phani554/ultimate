@@ -1,0 +1,377 @@
+---
+interface Props {
+	placeholder: string;
+	revealStages: number;
+	imagePath?: string;
+}
+
+const { placeholder, revealStages = 3, imagePath = "/cyber-lock.jpg" } = Astro.props;
+---
+
+<div class="masked-image-container">
+	<div class="masked-image">
+		<div class="image-placeholder">{placeholder}</div>
+		<div class="image-layers">
+			<div class="image-layer layer-1" style={`background-image: url(${imagePath});`}></div>
+			<div class="image-layer layer-2" style={`background-image: url(${imagePath});`}></div>
+			<div class="image-layer layer-3" style={`background-image: url(${imagePath});`}></div>
+		</div>
+	</div>
+	<div class="image-status">
+		<div class="status-bar">
+			<div class="status-progress" id="image-progress"></div>
+		</div>
+		<div class="status-text">Decryption Progress: <span id="progress-text">0%</span></div>
+	</div>
+</div>
+
+<style>
+	.masked-image-container {
+		margin: 20px 0;
+		width: 100%;
+	}
+	
+	.masked-image {
+		position: relative;
+		width: 100%;
+		height: 300px;
+		background-color: rgba(0, 0, 0, 0.3);
+		border: 1px solid var(--terminal-dim);
+		border-radius: 4px;
+		overflow: hidden;
+		box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+	}
+	
+	.image-placeholder {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--terminal-dim);
+		font-style: italic;
+		z-index: 1;
+		background: repeating-linear-gradient(
+			45deg,
+			rgba(0, 0, 0, 0.2),
+			rgba(0, 0, 0, 0.2) 10px,
+			rgba(0, 0, 0, 0.3) 10px,
+			rgba(0, 0, 0, 0.3) 20px
+		);
+		transition: opacity 0.8s ease-in-out;
+	}
+	
+	.image-layers {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 2;
+	}
+	
+	.image-layer {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background-size: cover;
+		background-position: center;
+		opacity: 0;
+		transition: opacity 1s ease-in-out;
+	}
+	
+	.layer-1 {
+		filter: blur(15px) hue-rotate(90deg) brightness(0.5);
+		clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
+	}
+	
+	.layer-2 {
+		filter: blur(8px) hue-rotate(45deg) brightness(0.7);
+		clip-path: polygon(0 33%, 100% 33%, 100% 66%, 0 66%);
+	}
+	
+	.layer-3 {
+		filter: blur(0px);
+		clip-path: polygon(0 66%, 100% 66%, 100% 100%, 0 100%);
+	}
+	
+	.image-status {
+		margin-top: 10px;
+	}
+	
+	.status-bar {
+		width: 100%;
+		height: 10px;
+		background-color: rgba(0, 0, 0, 0.3);
+		border-radius: 5px;
+		overflow: hidden;
+		border: 1px solid rgba(139, 233, 253, 0.2);
+	}
+	
+	.status-progress {
+		height: 100%;
+		width: 0%;
+		background: linear-gradient(90deg, var(--terminal-accent) 0%, #50fa7b 100%);
+		transition: width 1s ease-in-out;
+		box-shadow: 0 0 10px rgba(139, 233, 253, 0.5);
+	}
+	
+	.status-text {
+		margin-top: 5px;
+		font-size: 0.8em;
+		color: var(--terminal-dim);
+		text-align: right;
+	}
+</style>
+
+<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		const progressBar = document.getElementById('image-progress');
+		const progressText = document.getElementById('progress-text');
+		const layers = document.querySelectorAll('.image-layer');
+		const totalLayers = layers.length;
+		let revealedLayers = 0;
+		
+		// Listen for reveal events
+		document.addEventListener('revealImage', (event) => {
+			if (revealedLayers < totalLayers) {
+				revealedLayers++;
+				
+				// Update progress bar with animation
+				const progress = (revealedLayers / totalLayers) * 100;
+				
+				// Animate progress bar
+				if (progressBar) {
+					let currentWidth = parseInt(progressBar.style.width || '0');
+					const targetWidth = progress;
+					const step = (targetWidth - currentWidth) / 20;
+					
+					const animateProgress = () => {
+						currentWidth += step;
+						if (currentWidth >= targetWidth) {
+							currentWidth = targetWidth;
+							clearInterval(progressInterval);
+						}
+						progressBar.style.width = `${currentWidth}%`;
+						if (progressText) progressText.textContent = `${Math.round(currentWidth)}%`;
+					};
+					
+					const progressInterval = setInterval(animateProgress, 50);
+				}
+				
+				// Reveal layer with enhanced glitch effect
+				const layer = layers[revealedLayers - 1];
+				if (layer) {
+					// Add glitch effect
+					layer.style.clipPath = 'inset(0 0 0 0)';
+					layer.style.animation = 'none';
+					
+					// Force reflow
+					void layer.offsetWidth;
+					
+					// Add enhanced glitch animation
+					layer.style.animation = 'layerGlitch 0.8s ease-out';
+					
+					// Show layer
+					setTimeout(() => {
+						layer.style.opacity = '1';
+						
+						// Add scan line effect after reveal
+						const scanLines = document.createElement('div');
+						scanLines.className = 'scan-lines';
+						layer.appendChild(scanLines);
+					}, 100);
+				}
+				
+				// If all layers revealed, hide placeholder with animation
+				if (revealedLayers === totalLayers) {
+					const placeholder = document.querySelector('.image-placeholder');
+					if (placeholder) {
+						placeholder.style.opacity = '0';
+					}
+					
+					// Add final reveal effect
+					const imageContainer = document.querySelector('.masked-image');
+					if (imageContainer) {
+						imageContainer.classList.add('fully-revealed');
+						
+						// Store in localStorage that the image is fully revealed
+						localStorage.setItem('cyber_lock_revealed', 'true');
+						
+						// Resize the image container to show full image
+						setTimeout(() => {
+							imageContainer.style.height = '500px'; // Increased height
+							
+							// Change background size to contain to show full image
+							layers.forEach(layer => {
+								layer.style.backgroundSize = 'contain';
+								layer.style.backgroundRepeat = 'no-repeat';
+							});
+						}, 1000);
+					}
+				}
+			}
+		});
+		
+		// Check if we're on stage2 page
+		const isStage2Page = window.location.pathname.includes('/stage2');
+		
+		if (isStage2Page) {
+			// Check if all three puzzles have been solved
+			const puzzle1Solved = localStorage.getItem('puzzle_cipher-puzzle') === 'solved';
+			const puzzle2Solved = localStorage.getItem('puzzle_hash-puzzle') === 'solved';
+			const puzzle3Solved = localStorage.getItem('puzzle_key-puzzle') === 'solved';
+			const allPuzzlesSolved = puzzle1Solved && puzzle2Solved && puzzle3Solved;
+			
+			// Only reveal the image if all puzzles are solved
+			if (allPuzzlesSolved && localStorage.getItem('cyber_lock_revealed') === 'true') {
+				// Reveal all layers immediately
+				layers.forEach(layer => {
+					layer.style.opacity = '1';
+					layer.style.clipPath = 'inset(0 0 0 0)';
+					layer.style.backgroundSize = 'contain';
+					layer.style.backgroundRepeat = 'no-repeat';
+				});
+				
+				// Update progress bar
+				if (progressBar) {
+					progressBar.style.width = '100%';
+				}
+				if (progressText) {
+					progressText.textContent = '100%';
+				}
+				
+				// Hide placeholder
+				const placeholder = document.querySelector('.image-placeholder');
+				if (placeholder) {
+					placeholder.style.opacity = '0';
+				}
+				
+				// Add fully revealed class and resize
+				const imageContainer = document.querySelector('.masked-image');
+				if (imageContainer) {
+					imageContainer.classList.add('fully-revealed');
+					imageContainer.style.height = '500px'; // Increased height
+				}
+			} else {
+				// Reset the image to masked state if puzzles aren't all solved
+				revealedLayers = 0;
+				
+				// Reset progress bar
+				if (progressBar) {
+					progressBar.style.width = '0%';
+				}
+				if (progressText) {
+					progressText.textContent = '0%';
+				}
+				
+				// Hide all layers
+				layers.forEach(layer => {
+					layer.style.opacity = '0';
+				});
+				
+				// Show placeholder
+				const placeholder = document.querySelector('.image-placeholder');
+				if (placeholder) {
+					placeholder.style.opacity = '1';
+				}
+			}
+		}
+	});
+</script>
+
+<style is:global>
+	@keyframes layerGlitch {
+		0% {
+			clip-path: inset(0 0 100% 0);
+			transform: translateX(-5px);
+			filter: hue-rotate(-30deg) brightness(1.5);
+		}
+		10% {
+			clip-path: inset(10% 0 80% 0);
+			transform: translateX(5px);
+			filter: hue-rotate(30deg) brightness(0.8);
+		}
+		20% {
+			clip-path: inset(30% 0 50% 0);
+			transform: translateX(-5px);
+			filter: hue-rotate(-20deg) brightness(1.2);
+		}
+		30% {
+			clip-path: inset(50% 0 30% 0);
+			transform: translateX(5px);
+			filter: hue-rotate(20deg) brightness(0.9);
+		}
+		40% {
+			clip-path: inset(70% 0 10% 0);
+			transform: translateX(-5px);
+			filter: hue-rotate(-10deg) brightness(1.1);
+		}
+		50% {
+			clip-path: inset(10% 0 90% 0);
+			transform: translateX(5px);
+			filter: hue-rotate(10deg) brightness(1);
+		}
+		60% {
+			clip-path: inset(40% 0 30% 0);
+			transform: translateX(-5px);
+			filter: hue-rotate(-5deg) brightness(1.05);
+		}
+		70% {
+			clip-path: inset(30% 0 60% 0);
+			transform: translateX(5px);
+			filter: hue-rotate(5deg) brightness(0.95);
+		}
+		80% {
+			clip-path: inset(20% 0 70% 0);
+			transform: translateX(-5px);
+			filter: hue-rotate(-2deg) brightness(1.02);
+		}
+		90% {
+			clip-path: inset(10% 0 50% 0);
+			transform: translateX(5px);
+			filter: hue-rotate(2deg) brightness(0.98);
+		}
+		100% {
+			clip-path: inset(0 0 0 0);
+			transform: translateX(0);
+			filter: hue-rotate(0) brightness(1);
+		}
+	}
+	
+	.scan-lines {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: repeating-linear-gradient(
+			0deg,
+			rgba(0, 0, 0, 0),
+			rgba(0, 0, 0, 0) 1px,
+			rgba(0, 0, 0, 0.1) 1px,
+			rgba(0, 0, 0, 0.1) 2px
+		);
+		pointer-events: none;
+		z-index: 10;
+	}
+	
+	.fully-revealed {
+		box-shadow: 0 0 20px rgba(139, 233, 253, 0.5);
+		animation: pulseReveal 2s infinite;
+	}
+	
+	@keyframes pulseReveal {
+		0%, 100% {
+			box-shadow: 0 0 15px rgba(139, 233, 253, 0.5);
+		}
+		50% {
+			box-shadow: 0 0 25px rgba(139, 233, 253, 0.8);
+		}
+	}
+</style>
