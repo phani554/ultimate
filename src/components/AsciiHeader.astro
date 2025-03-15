@@ -63,9 +63,12 @@ const { title = "CYBER SCAVENGER HUNT" } = Astro.props;
   }
 
   .header-logo {
-    width: 100%;
-    height: 100%;
+    width: 200%;
+    height: 200%;
+    object-position: center;
     object-fit: contain;
+    transform: translateY(12%);
+    animation: glitchText 2s infinite alternate;
     filter: drop-shadow(0 0 5px rgba(139, 233, 253, 0.5));
   }
 
