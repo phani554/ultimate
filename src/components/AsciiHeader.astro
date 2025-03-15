@@ -7,20 +7,25 @@ const { title = "CYBER SCAVENGER HUNT" } = Astro.props;
 ---
 
 <div class="ascii-header">
-  <pre class="ascii-logo">
+  <div class="header-logo-container">
+    <img src="/logo.png" alt="Cyber Shield Logo" class="header-logo" />
+  </div>
+  <div class="header-content">
+    <pre class="ascii-logo">
  ██████╗██╗   ██╗██████╗ ███████╗██████╗     ██╗  ██╗██╗   ██╗███╗   ██╗████████╗
 ██╔════╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔══██╗    ██║  ██║██║   ██║████╗  ██║╚══██╔══╝
 ██║      ╚████╔╝ ██████╔╝█████╗  ██████╔╝    ███████║██║   ██║██╔██╗ ██║   ██║   
 ██║       ╚██╔╝  ██╔══██╗██╔══╝  ██╔══██╗    ██╔══██║██║   ██║██║╚██╗██║   ██║   
 ╚██████╗   ██║   ██████╔╝███████╗██║  ██║    ██║  ██║╚██████╔╝██║ ╚████║   ██║   
  ╚═════╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝    ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   
-  </pre>
-  <div class="header-info">
-    <div class="header-title">{title}</div>
-    <div class="header-status">
-      <span class="status-item">STATUS: <span class="status-active">ACTIVE</span></span>
-      <span class="status-item">SECURITY: <span class="status-warning">COMPROMISED</span></span>
-      <span class="status-item">CONNECTION: <span class="status-secure">SECURE</span></span>
+    </pre>
+    <div class="header-info">
+      <div class="header-title">{title}</div>
+      <div class="header-status">
+        <span class="status-item">STATUS: <span class="status-active">ACTIVE</span></span>
+        <span class="status-item">SECURITY: <span class="status-warning">COMPROMISED</span></span>
+        <span class="status-item">CONNECTION: <span class="status-secure">SECURE</span></span>
+      </div>
     </div>
   </div>
 </div>
@@ -34,6 +39,34 @@ const { title = "CYBER SCAVENGER HUNT" } = Astro.props;
     border-radius: 4px;
     padding: 1rem;
     overflow: hidden;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .header-logo-container {
+    flex-shrink: 0;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px dashed var(--terminal-dim, #6272a4);
+    padding-right: 1rem;
+  }
+
+  .header-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .header-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 5px rgba(139, 233, 253, 0.5));
   }
 
   .ascii-logo {
@@ -52,7 +85,6 @@ const { title = "CYBER SCAVENGER HUNT" } = Astro.props;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 0.5rem;
     padding-top: 0.5rem;
     border-top: 1px dashed var(--terminal-dim, #6272a4);
   }
