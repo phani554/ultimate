@@ -11,6 +11,7 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@vercel/analytics": "^1.1.1",
     "animate.css": "^4.1.1",
     "astro": "^4.15.11",
     "crypto-js": "^4.2.0"
